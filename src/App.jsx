@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { askQuestion, fetchDocuments, uploadPdf } from "./api";
+import { askQuestion, deleteDocument, fetchDocuments, uploadPdf } from "./api";
 
 function IconPlus() {
   return (
@@ -35,12 +35,22 @@ function IconPanel() {
   );
 }
 
+function IconTrash() {
+  return (
+    <svg className="cg-icon cg-icon--xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+      <path d="M3 6h18M8 6V4h8v2m-9 4v10h10V10" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M10 14v-4M14 14v-4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export default function App() {
   const [documents, setDocuments] = useState([]);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
   const [error, setError] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(() =>
     typeof window !== "undefined" ? window.matchMedia("(min-width: 769px)").matches : true
@@ -152,6 +162,34 @@ export default function App() {
     setInput(text);
   }
 
+  async function handleDeleteDocument(doc) {
+    if (
+      !window.confirm(
+        `Remove “${doc.filename}” from the index?\n\nIt will be hidden from answers but kept in the database (soft delete).`
+      )
+    ) {
+      return;
+    }
+    setError("");
+    setDeletingId(doc.id);
+    try {
+      await deleteDocument(doc.id);
+      await loadDocuments();
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: nextId(),
+          role: "system",
+          content: `Removed “${doc.filename}” from your active documents.`,
+        },
+      ]);
+    } catch (err) {
+      setError(err.message || "Delete failed");
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
   const emptyChat = messages.length === 0 && !loading;
 
   return (
@@ -176,6 +214,16 @@ export default function App() {
                     <IconFile />
                   </span>
                   <span className="doc-item-name">{doc.filename}</span>
+                  <button
+                    type="button"
+                    className="doc-item-delete"
+                    title="Remove from index"
+                    aria-label={`Remove ${doc.filename}`}
+                    disabled={deletingId === doc.id || uploading || loading}
+                    onClick={() => handleDeleteDocument(doc)}
+                  >
+                    {deletingId === doc.id ? <span className="doc-item-spinner" aria-hidden /> : <IconTrash />}
+                  </button>
                 </li>
               ))}
             </ul>

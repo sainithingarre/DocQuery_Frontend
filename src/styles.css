@@ -148,7 +148,7 @@ body {
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  padding: 10px 12px;
+  padding: 10px 8px 10px 12px;
   border-radius: 12px;
   margin-bottom: 4px;
   cursor: default;
@@ -166,10 +166,47 @@ body {
 }
 
 .doc-item-name {
+  flex: 1;
+  min-width: 0;
   font-size: 0.875rem;
   line-height: 1.4;
   color: var(--ink);
   word-break: break-word;
+}
+
+.doc-item-delete {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  margin-top: -2px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+
+.doc-item-delete:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+}
+
+.doc-item-delete:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.doc-item-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(239, 68, 68, 0.25);
+  border-top-color: #dc2626;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
 }
 
 .sidebar-footer {
@@ -308,6 +345,11 @@ body {
 .cg-icon--sm {
   width: 18px;
   height: 18px;
+}
+
+.cg-icon--xs {
+  width: 16px;
+  height: 16px;
 }
 
 /* Message stream */

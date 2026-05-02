@@ -45,3 +45,20 @@ export async function fetchDocuments() {
   if (!res.ok) throw new Error("Could not load documents");
   return res.json();
 }
+
+export async function deleteDocument(documentId) {
+  const res = await fetch(`${API_BASE}/documents/${encodeURIComponent(documentId)}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) {
+    let detail = "Could not delete document";
+    try {
+      const j = await res.json();
+      detail = j.detail || detail;
+    } catch {
+      /* ignore */
+    }
+    throw new Error(detail);
+  }
+  return res.json();
+}
