@@ -163,11 +163,7 @@ export default function App() {
   }
 
   async function handleDeleteDocument(doc) {
-    if (
-      !window.confirm(
-        `Remove “${doc.filename}” from the index?\n\nIt will be hidden from answers but kept in the database (soft delete).`
-      )
-    ) {
+    if (!window.confirm(`Remove “${doc.filename}” from the index?`)) {
       return;
     }
     setError("");
